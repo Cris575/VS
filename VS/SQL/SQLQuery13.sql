@@ -68,27 +68,35 @@ ORDER BY
 
 
 
-DECLARE @StartDate DATETIME = '2023-10-02 00:00:00'
-                                    DECLARE @EndDate DATETIME = '2024-04-23 00:00:00'
+DECLARE @EndDate DATETIME = '@thisDay'
+                                DECLARE @StartDate DATETIME
 
-                                    CREATE TABLE #TempResultsDATAProyectallCLHOURS (
-                                        DateRangeStart DATETIME,
-                                        StandardPercentage VARCHAR(10)
-                                    )
 
-                                    WHILE @StartDate <= @EndDate
-                                    BEGIN
-                                        INSERT INTO #TempResultsDATAProyectallCLHOURS (DateRangeStart, StandardPercentage)
-                                        SELECT @StartDate AS DateRangeStart, FORMAT(ROUND(SUM([Standard]) / 2040 * 100, 2), '0.##') AS StandardPercentage
-                                        FROM CLHOURS
-                                        WHERE [ProdDate] >= DATEADD(DAY,1,@StartDate) AND [ProdDate] < DATEADD(DAY, 8, @StartDate) AND Qty > 0
+                                SET @StartDate = DATEADD(WEEK, -31, @EndDate)
 
-                                        SET @StartDate = DATEADD(DAY, 7, @StartDate)
-                                    END
+                                CREATE TABLE #TempResultsDATAProyectallCLHOURS (
+                                    DateRangeStart DATETIME,
+                                    StandardPercentage VARCHAR(10)
+                                )
 
-                                    SELECT * FROM #TempResultsDATAProyectallCLHOURS
+                                WHILE @StartDate <= @EndDate
+                                BEGIN
+                                    INSERT INTO #TempResultsDATAProyectallCLHOURS (DateRangeStart, StandardPercentage)
+                                    SELECT @StartDate AS DateRangeStart, FORMAT(ROUND(SUM(Standard) / 2040 * 100, 2), '0.##') AS StandardPercentage
+                                    FROM CLHOURS
+                                    WHERE ProdDate >= DATEADD(DAY, 1, @StartDate) AND ProdDate < DATEADD(DAY, 8, @StartDate) AND Qty > 0
 
-                                    DROP TABLE #TempResults
+                                    SET @StartDate = DATEADD(WEEK, 1, @StartDate)
+                                END
+
+                                DELETE FROM #TempResultsDATAProyectallCLHOURS
+                                WHERE DateRangeStart = (SELECT MIN(DateRangeStart) FROM #TempResultsDATAProyectallCLHOURS)
+
+                                SELECT TOP(30)  * FROM #TempResultsDATAProyectallCLHOURS
+                                WHERE StandardPercentage IS NOT NULL
+                                ORDER BY DateRangeStart DESC
+
+                                DROP TABLE #TempResultsDATAProyectallCLHOURS
  -----------------------------------
 
 SELECT * FROM ( SELECT top 30 Week = DATEADD(DAY, - 1 * DATEPART(dw, ProdDate - 2 ), ProdDate ), Standard = round(SUM(Standard)/100,2) FROM CLHOURS WHERE  ProdDate <= DATEADD(mm, 8, GetDate()) AND ( WorkOrder IS NOT NULL AND PartNo IS NOT NULL AND Qty>0 AND Standard IS NOT NULL  ) GROUP BY DATEADD(DAY, - 1 * DATEPART(dw, ProdDate - 2 ),ProdDate ) ORDER BY WEEK DESC) a ORDER BY a.WEEK ASC
