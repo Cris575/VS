@@ -68,7 +68,7 @@ ORDER BY
 
 
 
-DECLARE @EndDate DATETIME = '@thisDay'
+DECLARE @EndDate DATETIME = @thisDay
                                 DECLARE @StartDate DATETIME
 
 
