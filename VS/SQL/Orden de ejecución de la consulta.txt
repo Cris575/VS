@@ -1,0 +1,24 @@
+Orden de ejecución de la consulta
+1. FROMy JOINs
+La FROMcláusula y las subsiguientes JOINse ejecutan primero para determinar el conjunto de datos de trabajo total que se está consultando. Esto incluye subconsultas en esta cláusula y puede provocar que se creen tablas temporales internas que contengan todas las columnas y filas de las tablas que se unen.
+
+2.WHERE
+Una vez que tenemos el conjunto total de datos de trabajo, las WHERErestricciones de primer paso se aplican a las filas individuales y las filas que no satisfacen la restricción se descartan. Cada una de las restricciones solo puede acceder a columnas directamente desde las tablas solicitadas en la FROMcláusula. Los alias en la SELECTparte de la consulta no son accesibles en la mayoría de las bases de datos, ya que pueden incluir expresiones que dependen de partes de la consulta que aún no se han ejecutado.
+
+3.GROUP BY
+Las filas restantes después de WHEREaplicar las restricciones se agrupan según valores comunes en la columna especificada en la GROUP BYcláusula. Como resultado de la agrupación, solo habrá tantas filas como valores únicos en esa columna. Implícitamente, esto significa que solo debería necesitar usar esto cuando tenga funciones agregadas en su consulta.
+
+4.HAVING
+Si la consulta tiene una GROUP BYcláusula, las restricciones de la HAVINGcláusula se aplican a las filas agrupadas y se descartan las filas agrupadas que no satisfacen la restricción. Al igual que la WHERE cláusula, tampoco se puede acceder a los alias desde este paso en la mayoría de las bases de datos.
+
+5.SELECT
+SELECTFinalmente se calculan todas las expresiones de la parte de la consulta.
+
+6.DISTINCT
+De las filas restantes, DISTINCTse descartarán las filas con valores duplicados en la columna marcada como.
+
+7.ORDER BY
+Si la cláusula especifica un orden ORDER BY, las filas se ordenan según los datos especificados en orden ascendente o descendente. Dado que se han calculado todas las expresiones de la SELECTparte de la consulta, puede hacer referencia a los alias en esta cláusula.
+
+8. LIMIT/OFFSET
+Finalmente, las filas que quedan fuera del rango especificado por LIMITy OFFSETse descartan, dejando el conjunto final de filas que se devolverá de la consulta.
