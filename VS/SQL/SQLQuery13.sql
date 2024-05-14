@@ -103,25 +103,24 @@ SELECT * FROM ( SELECT top 30 Week = DATEADD(DAY, - 1 * DATEPART(dw, ProdDate - 
 
 ------------------------------------
 SELECT 
-    SUM(CASE WHEN STATUS = 'PENDING' THEN 1 ELSE 0 END) AS PENDING,
-    SUM(CASE WHEN STATUS LIKE '%PICK%' THEN 1 ELSE 0 END) AS PICK,
-    SUM(CASE WHEN STATUS LIKE '%STK%' THEN 1 ELSE 0 END) AS STOCK,
-    SUM(CASE WHEN STATUS LIKE '%PREP-LABEL%' THEN 1 ELSE 0 END) AS PREP_LABEL,
-    SUM(CASE WHEN STATUS LIKE '%PREP-WIRE%' THEN 1 ELSE 0 END) AS PREP_WIRE,
-    SUM(CASE WHEN STATUS LIKE '%WIP-READY%' THEN 1 ELSE 0 END) AS WIP_READY,
-    SUM(CASE WHEN STATUS LIKE '%WIP%' AND STATUS NOT LIKE '%-READY%' THEN 1 ELSE 0 END) AS WIP,
-    SUM(CASE WHEN STATUS LIKE '%TEST%' THEN 1 ELSE 0 END) AS TEST,
-    SUM(CASE WHEN STATUS LIKE '%INSP%' THEN 1 ELSE 0 END) AS INSPECTION,
-    SUM(CASE WHEN STATUS = 'PACKAGING' THEN 1 ELSE 0 END) AS PACKAGING,
-    SUM(CASE WHEN STATUS = 'SHIPPING' THEN 1 ELSE 0 END) AS SHIPPING
-FROM 
-    SO2_420
-INNER JOIN 
-    WorkOrder_420 ON SO2_420.SalesOrderNo = WorkOrder_420.SalesOrderNumber 
-        AND SO2_420.LineKey = WorkOrder_420.LineIndex
-WHERE 
-    SO2_420.QuantityOrdered > SO2_420.QuantityShipped;
-
+                                        SUM(CASE WHEN STATUS = 'PENDING' AND ItemNumber NOT LIKE('%NRE%') AND ItemNumber NOT LIKE ('%M%') AND ItemNumber NOT LIKE ('%C%') AND ProductLine <> 'REP' THEN 1 ELSE 0 END) AS PENDING,
+                                        SUM(CASE WHEN STATUS LIKE '%PICK%' THEN 1 ELSE 0 END) AS PICK,
+                                        SUM(CASE WHEN STATUS LIKE '%STK%' THEN 1 ELSE 0 END) AS STOCK,
+                                        SUM(CASE WHEN STATUS LIKE '%PREP-LABEL%' THEN 1 ELSE 0 END) AS PREP_LABEL,
+                                        SUM(CASE WHEN STATUS LIKE '%PREP-WIRE%' THEN 1 ELSE 0 END) AS PREP_WIRE,
+                                        SUM(CASE WHEN STATUS LIKE '%WIP-READY%' THEN 1 ELSE 0 END) AS WIP_READY,
+                                        SUM(CASE WHEN STATUS LIKE '%WIP%' AND STATUS NOT LIKE '%-READY%' THEN 1 ELSE 0 END) AS WIP,
+                                        SUM(CASE WHEN STATUS LIKE '%TEST%' AND ItemNumber NOT LIKE('%NRE%') AND ItemNumber NOT LIKE ('%M%') AND ItemNumber NOT LIKE ('%C%') AND ProductLine <> 'REP' THEN 1 ELSE 0 END) AS TEST,
+                                        SUM(CASE WHEN STATUS LIKE '%INSP%' AND ItemNumber NOT LIKE('%NRE%') AND ProductLine <> 'REP' THEN 1 ELSE 0 END) AS INSPECTION,
+                                        SUM(CASE WHEN STATUS = 'PACKAGING' AND ItemNumber NOT LIKE('%NRE%') AND ItemNumber NOT LIKE ('%M%') AND ItemNumber NOT LIKE ('%C%') AND ProductLine <> 'REP' THEN 1 ELSE 0 END) AS PACKAGING,
+                                        SUM(CASE WHEN STATUS LIKE 'SHIP' AND ItemNumber NOT LIKE('%NRE%') AND ItemNumber NOT LIKE ('%M%') AND ItemNumber NOT LIKE ('%C%') AND ProductLine <> 'REP' THEN 1 ELSE 0 END) AS SHIPPING
+                                    FROM 
+                                        SO2_420
+                                    INNER JOIN 
+                                        WorkOrder_420 ON SO2_420.SalesOrderNo = WorkOrder_420.SalesOrderNumber 
+                                            AND SO2_420.LineKey = WorkOrder_420.LineIndex 
+                                    WHERE 
+                                        SO2_420.QuantityOrdered > SO2_420.QuantityShipped;
 ---------------------------------------------------------
 
 SELECT 
