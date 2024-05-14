@@ -120,12 +120,11 @@ SO2_420.QuantityOrdered > SO2_420.QuantityShipped;
 ---------------------------------------------------------
 
 SELECT 
-MIN(DueDate) AS EarliestDueDate, 
-FORMAT(SUM(QtyDue * Cost), '0') AS TotalCost
+    DATEADD(DAY, -1 * DATEPART(DW, DueDate), DueDate) AS DateRangeStart,
+    FORMAT(SUM(QtyDue * Cost), '0') AS StandardPercentage
 FROM 
-PO
+    PO
 GROUP BY 
-DATEPART(YEAR, DueDate), 
-DATEPART(WEEK, DueDate)
+    DATEADD(DAY, -1 * DATEPART(DW, DueDate), DueDate)
 ORDER BY 
-EarliestDueDate ASC;
+    DateRangeStart ASC;
