@@ -121,3 +121,11 @@ INNER JOIN
         AND SO2_420.LineKey = WorkOrder_420.LineIndex
 WHERE 
     SO2_420.QuantityOrdered > SO2_420.QuantityShipped;
+
+---------------------------------------------------------
+
+SELECT MIN(DueDate) AS EarliestDueDate, 
+       FORMAT(SUM(QtyDue * Cost),'0') AS TotalCost
+FROM PO
+GROUP BY DATEPART(week, DueDate)
+ORDER BY EarliestDueDate asc;
