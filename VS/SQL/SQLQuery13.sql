@@ -126,7 +126,6 @@ WHERE
 
 SELECT 
     MIN(DueDate) AS EarliestDueDate, 
-    DATEPART(YEAR, DueDate) AS Year,
     FORMAT(SUM(QtyDue * Cost), '0') AS TotalCost
 FROM 
     PO
