@@ -124,8 +124,14 @@ WHERE
 
 ---------------------------------------------------------
 
-SELECT MIN(DueDate) AS EarliestDueDate, 
-       FORMAT(SUM(QtyDue * Cost),'0') AS TotalCost
-FROM PO
-GROUP BY DATEPART(week, DueDate)
-ORDER BY EarliestDueDate asc;
+SELECT 
+    MIN(DueDate) AS EarliestDueDate, 
+    DATEPART(YEAR, DueDate) AS Year,
+    FORMAT(SUM(QtyDue * Cost), '0') AS TotalCost
+FROM 
+    PO
+GROUP BY 
+    DATEPART(YEAR, DueDate), 
+    DATEPART(WEEK, DueDate)
+ORDER BY 
+    EarliestDueDate ASC;
