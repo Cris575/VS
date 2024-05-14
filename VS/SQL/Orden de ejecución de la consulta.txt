@@ -1,24 +1,15 @@
-Orden de ejecución de la consulta
-1. FROMy JOINs
-La FROMcláusula y las subsiguientes JOINse ejecutan primero para determinar el conjunto de datos de trabajo total que se está consultando. Esto incluye subconsultas en esta cláusula y puede provocar que se creen tablas temporales internas que contengan todas las columnas y filas de las tablas que se unen.
+FROM y JOINs: En esta etapa, se ejecuta la cláusula FROM junto con cualquier JOIN para determinar el conjunto de datos completo sobre el cual se realizará la consulta. Esto puede incluir subconsultas y la creación de tablas temporales internas que contienen todas las columnas y filas de las tablas unidas.
 
-2.WHERE
-Una vez que tenemos el conjunto total de datos de trabajo, las WHERErestricciones de primer paso se aplican a las filas individuales y las filas que no satisfacen la restricción se descartan. Cada una de las restricciones solo puede acceder a columnas directamente desde las tablas solicitadas en la FROMcláusula. Los alias en la SELECTparte de la consulta no son accesibles en la mayoría de las bases de datos, ya que pueden incluir expresiones que dependen de partes de la consulta que aún no se han ejecutado.
+WHERE: Una vez que se ha establecido el conjunto total de datos, las restricciones definidas en la cláusula WHERE se aplican a las filas individuales. Aquellas que no cumplan con estas restricciones son descartadas. Cada restricción en esta etapa solo puede acceder a las columnas directamente relacionadas con las tablas especificadas en la cláusula FROM.
 
-3.GROUP BY
-Las filas restantes después de WHEREaplicar las restricciones se agrupan según valores comunes en la columna especificada en la GROUP BYcláusula. Como resultado de la agrupación, solo habrá tantas filas como valores únicos en esa columna. Implícitamente, esto significa que solo debería necesitar usar esto cuando tenga funciones agregadas en su consulta.
+GROUP BY: Las filas que pasan la fase de filtrado WHERE se agrupan según los valores comunes de la columna especificada en la cláusula GROUP BY. Esto resulta en un conjunto de filas únicas basadas en esos valores. Es importante utilizar esta cláusula principalmente cuando se emplean funciones agregadas en la consulta.
 
-4.HAVING
-Si la consulta tiene una GROUP BYcláusula, las restricciones de la HAVINGcláusula se aplican a las filas agrupadas y se descartan las filas agrupadas que no satisfacen la restricción. Al igual que la WHERE cláusula, tampoco se puede acceder a los alias desde este paso en la mayoría de las bases de datos.
+HAVING: Si la consulta incluye una cláusula GROUP BY, las restricciones en la cláusula HAVING se aplican a las filas agrupadas. Aquellas que no cumplan con estas restricciones son descartadas. Similar a la cláusula WHERE, no se pueden acceder a los alias en esta etapa en la mayoría de las bases de datos.
 
-5.SELECT
-SELECTFinalmente se calculan todas las expresiones de la parte de la consulta.
+SELECT: En esta fase, se calculan todas las expresiones especificadas en la parte SELECT de la consulta.
 
-6.DISTINCT
-De las filas restantes, DISTINCTse descartarán las filas con valores duplicados en la columna marcada como.
+DISTINCT: Se eliminan las filas duplicadas de las que quedan después de las etapas anteriores, basándose en los valores de la columna especificada en la cláusula DISTINCT.
 
-7.ORDER BY
-Si la cláusula especifica un orden ORDER BY, las filas se ordenan según los datos especificados en orden ascendente o descendente. Dado que se han calculado todas las expresiones de la SELECTparte de la consulta, puede hacer referencia a los alias en esta cláusula.
+ORDER BY: Si se especifica una cláusula ORDER BY, las filas se ordenan según los criterios especificados, ya sea en orden ascendente o descendente. Dado que en este punto se han calculado todas las expresiones de la cláusula SELECT, es posible hacer referencia a los alias aquí.
 
-8. LIMIT/OFFSET
-Finalmente, las filas que quedan fuera del rango especificado por LIMITy OFFSETse descartan, dejando el conjunto final de filas que se devolverá de la consulta.
+LIMIT/OFFSET: Por último, se aplican los límites definidos por las cláusulas LIMIT y OFFSET, lo que resulta en el conjunto final de filas que se devolverán de la consulta.
