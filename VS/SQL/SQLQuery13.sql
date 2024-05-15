@@ -128,3 +128,34 @@ GROUP BY
     DATEADD(DAY, -1 * DATEPART(DW, DueDate), DueDate)
 ORDER BY 
     DateRangeStart ASC;
+
+--------------------------------------------------------
+
+DECLARE @EndDate DATETIME = '5/13/2024'
+DECLARE @StartDate DATETIME
+
+SET @StartDate = DATEADD(WEEK, -29, @EndDate)
+
+;WITH TempResultsCTE AS (
+    SELECT
+        DateRangeStart = DATEADD(WEEK, Number, @StartDate),
+        StandardPercentage = FORMAT(ROUND(SUM(Standard) / 2040.0 * 100, 2), '0.##')
+    FROM
+        CLHOURS
+    CROSS JOIN
+        (SELECT TOP 30 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1 AS Number FROM sys.objects) AS Numbers
+    WHERE
+        ProdDate >= DATEADD(DAY, 1, DATEADD(WEEK, Number, @StartDate)) 
+        AND ProdDate < DATEADD(DAY, 8, DATEADD(WEEK, Number, @StartDate)) 
+        AND Qty > 0
+    GROUP BY
+        Number
+)
+SELECT
+    *
+FROM
+    TempResultsCTE
+WHERE
+    StandardPercentage IS NOT NULL  -- Mostrar solo fechas con datos disponibles
+ORDER BY
+    DateRangeStart DESC
