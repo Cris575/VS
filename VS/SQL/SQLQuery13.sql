@@ -159,3 +159,124 @@ WHERE
     StandardPercentage IS NOT NULL  -- Mostrar solo fechas con datos disponibles
 ORDER BY
     DateRangeStart DESC
+
+--------------------------------------------
+
+SELECT 
+                               s.CustomerNumber, 
+                                s.SurveyYear, 
+                                ISNULL(s.Q01, -1) AS Q01, 
+                                s.Q01a, 
+                                ISNULL(s.Q02, -1) AS Q02, 
+                                s.Q02a, 
+                                s.Q03, 
+                                s.Q03a, 
+                                ISNULL(s.Q04, -1) AS Q04, 
+                                ISNULL(s.Q05, -1) AS Q05, 
+                                s.Q05a, 
+                                s.Q06, 
+                                s.Q06a, 
+                                ISNULL(s.Q07, -1) AS Q07, 
+                                ISNULL(s.Q08, -1) AS Q08, 
+                                ISNULL(s.Q09, -1) AS Q09, 
+                                s.Q09a, 
+                                s.Q10, 
+                                ISNULL(s.Q11, -1) AS Q11, 
+                                ISNULL(s.Q12, -1) AS Q12, 
+                                ISNULL(s.Q13, -1) AS Q13, 
+                                s.Q14, 
+                                s.Q15, 
+                                ISNULL(s.Q15a, -1) AS Q15a, 
+                                s.Q15b, 
+                                s.Q16, 
+                                s.Q16a, 
+                                s.Q17,
+                                FORMAT(
+                                    ROUND(
+                                        (COALESCE(s.Q01, 0) + COALESCE(s.Q02, 0) + COALESCE(s.Q04, 0) + COALESCE(s.Q05, 0) + COALESCE(s.Q07, 0) + COALESCE(s.Q08, 0) + 
+                                         COALESCE(s.Q09, 0) + COALESCE(s.Q10, 0) + COALESCE(s.Q11, 0) + COALESCE(s.Q12, 0) + COALESCE(s.Q13, 0) + COALESCE(s.Q15a, 0)) / 
+                                        NULLIF(
+                                            CAST(
+                                                CASE WHEN s.Q01 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q02 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q04 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q05 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q07 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q08 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q09 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q10 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q11 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q12 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q13 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN s.Q15a IS NOT NULL THEN 1 ELSE 0 END 
+                                            AS DECIMAL(10,2)
+                                            ), 0
+                                        ), 2
+                                    ), '#.00') AS AverageScore
+                            FROM 
+                                survey AS s
+                            WHERE
+                                COALESCE(Q01,Q02,Q04,Q05,Q07,Q08,Q09,Q10,Q11,Q12,Q13,Q15a) IS NOT NULL
+                            ORDER BY 
+                                s.SurveyYear DESC;
+
+-- variante
+
+SELECT 
+								UserName,
+                                CustomerNumber, 
+                                SurveyYear, 
+                                ISNULL(Q01, -1) AS Q01, 
+                                Q01a, 
+                                ISNULL(Q02, -1) AS Q02, 
+                                Q02a, 
+                                Q03, 
+                                Q03a, 
+                                ISNULL(Q04, -1) AS Q04, 
+                                ISNULL(Q05, -1) AS Q05, 
+                                Q05a, 
+                                Q06, 
+                                Q06a, 
+                                ISNULL(Q07, -1) AS Q07, 
+                                ISNULL(Q08, -1) AS Q08, 
+                                ISNULL(Q09, -1) AS Q09, 
+                                Q09a, 
+                                Q10, 
+                                ISNULL(Q11, -1) AS Q11, 
+                                ISNULL(Q12, -1) AS Q12, 
+                                ISNULL(Q13, -1) AS Q13, 
+                                Q14, 
+                                Q15, 
+                                ISNULL(Q15a, -1) AS Q15a, 
+                                Q15b, 
+                                Q16, 
+                                Q16a, 
+                                Q17,
+                                FORMAT(
+                                    ROUND(
+                                        (COALESCE(Q01, 0) + COALESCE(Q02, 0) + COALESCE(Q04, 0) + COALESCE(Q05, 0) + COALESCE(Q07, 0) + COALESCE(Q08, 0) + 
+                                         COALESCE(Q09, 0) + COALESCE(Q10, 0) + COALESCE(Q11, 0) + COALESCE(Q12, 0) + COALESCE(Q13, 0) + COALESCE(Q15a, 0)) / 
+                                        NULLIF(
+                                            CAST(
+                                                CASE WHEN Q01 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q02 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q04 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q05 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q07 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q08 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q09 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q10 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q11 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q12 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q13 IS NOT NULL THEN 1 ELSE 0 END +
+                                                CASE WHEN Q15a IS NOT NULL THEN 1 ELSE 0 END 
+                                            AS DECIMAL(10,2)
+                                            ), 0
+                                        ), 2
+                                    ), '#.00') AS AverageScore
+                            FROM 
+                                survey
+                            ORDER BY 
+                                SurveyYear DESC;
+
+
